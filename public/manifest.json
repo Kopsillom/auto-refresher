@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Auto Page Refresher",
+  "version": "1.0.0",
+  "description": "Automatically refresh pages at custom intervals.",
+  "permissions": [
+    "storage",
+    "alarms",
+    "tabs"
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Auto Refresh Settings"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "icons": {
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

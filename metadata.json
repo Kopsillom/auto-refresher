@@ -1,0 +1,5 @@
+{
+  "name": "Auto Page Refresher Extension",
+  "description": "A customizable browser extension to automatically refresh pages at set intervals (10s - 120s). Works offline and respects privacy.",
+  "requestFramePermissions": []
+}
