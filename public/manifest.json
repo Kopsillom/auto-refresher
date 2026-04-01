@@ -10,14 +10,14 @@
   ],
   "action": {
     "default_popup": "index.html",
-    "default_title": "Auto Refresh Settings"
+    "default_title": "Auto Refresh Settings",
+    "default_icon": "icon_off.png"
   },
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
   "icons": {
-    "48": "icon.png",
-    "128": "icon.png"
+    "128": "icon_off.png"
   }
 }

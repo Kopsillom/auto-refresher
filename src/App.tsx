@@ -45,17 +45,22 @@ const mockAlarms = {
   get: (name: string, callback: (alarm: any) => void) => callback(null)
 };
 
+const mockRuntime = {
+  sendMessage: (message: any) => console.log('Mock Message Sent:', message),
+  id: 'mock-id'
+};
+
 const chromeAPI = isExtension ? chrome : {
   storage: { local: mockStorage },
   tabs: mockTabs,
-  alarms: mockAlarms
+  alarms: mockAlarms,
+  runtime: mockRuntime
 };
 
 export default function App() {
   const [interval, setIntervalValue] = useState(30);
   const [isActive, setIsActive] = useState(false);
   const [currentTabId, setCurrentTabId] = useState<number | null>(null);
-  const [status, setStatus] = useState<'idle' | 'running'>('idle');
 
   useEffect(() => {
     // Get current tab and its refresh status
@@ -67,7 +72,7 @@ export default function App() {
         chromeAPI.storage.local.get([`tab_${tabId}_active`, `tab_${tabId}_interval`], (result) => {
           if (result[`tab_${tabId}_active`]) {
             setIsActive(true);
-            setStatus('running');
+            chromeAPI.runtime.sendMessage({ type: 'UPDATE_STATUS', isActive: true });
           }
           if (result[`tab_${tabId}_interval`]) {
             setIntervalValue(result[`tab_${tabId}_interval`]);
@@ -82,7 +87,9 @@ export default function App() {
 
     const newState = !isActive;
     setIsActive(newState);
-    setStatus(newState ? 'running' : 'idle');
+    
+    // Notify background script to update icon
+    chromeAPI.runtime.sendMessage({ type: 'UPDATE_STATUS', isActive: newState });
 
     if (newState) {
       // Start refreshing
