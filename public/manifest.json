@@ -17,6 +17,11 @@
     "service_worker": "background.js",
     "type": "module"
   },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "autorefresh@example.com"
+    }
+  },
   "icons": {
     "128": "icon_off.png"
   }

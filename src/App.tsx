@@ -61,6 +61,7 @@ export default function App() {
   const [interval, setIntervalValue] = useState(30);
   const [isActive, setIsActive] = useState(false);
   const [currentTabId, setCurrentTabId] = useState<number | null>(null);
+  const [tabTitle, setTabTitle] = useState<string>('Loading...');
 
   useEffect(() => {
     // Get current tab and its refresh status
@@ -68,11 +69,12 @@ export default function App() {
       if (tabs[0]?.id) {
         const tabId = tabs[0].id;
         setCurrentTabId(tabId);
+        setTabTitle(tabs[0].title || 'Unknown Page');
         
         chromeAPI.storage.local.get([`tab_${tabId}_active`, `tab_${tabId}_interval`], (result) => {
           if (result[`tab_${tabId}_active`]) {
             setIsActive(true);
-            chromeAPI.runtime.sendMessage({ type: 'UPDATE_STATUS', isActive: true });
+            chromeAPI.runtime.sendMessage({ type: 'UPDATE_STATUS', tabId: tabId, isActive: true });
           }
           if (result[`tab_${tabId}_interval`]) {
             setIntervalValue(result[`tab_${tabId}_interval`]);
@@ -88,8 +90,8 @@ export default function App() {
     const newState = !isActive;
     setIsActive(newState);
     
-    // Notify background script to update icon
-    chromeAPI.runtime.sendMessage({ type: 'UPDATE_STATUS', isActive: newState });
+    // Notify background script to update icon for this specific tab
+    chromeAPI.runtime.sendMessage({ type: 'UPDATE_STATUS', tabId: currentTabId, isActive: newState });
 
     if (newState) {
       // Start refreshing
@@ -127,9 +129,9 @@ export default function App() {
   };
 
   return (
-    <div className="w-[320px] min-h-[340px] bg-[#0F172A] text-white p-6 font-sans selection:bg-blue-500/30">
+    <div className="w-[320px] min-h-[360px] bg-[#0F172A] text-white p-6 font-sans selection:bg-blue-500/30">
       {/* Header */}
-      <header className="flex items-center justify-between mb-8">
+      <header className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <div className={`p-2 rounded-lg shadow-lg transition-colors duration-300 ${isActive ? 'bg-green-600/20' : 'bg-red-600/20'}`}>
             <RefreshCw className={`w-5 h-5 transition-colors duration-300 ${isActive ? 'text-green-500' : 'text-red-500'}`} />
@@ -137,6 +139,14 @@ export default function App() {
           <h1 className="text-lg font-bold tracking-tight">AutoRefresher</h1>
         </div>
       </header>
+
+      {/* Page Title Display */}
+      <div className="mb-6 px-3 py-2 bg-slate-800/30 rounded-lg border border-slate-700/30">
+        <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Current Page</p>
+        <p className="text-xs font-medium text-slate-300 truncate" title={tabTitle}>
+          {tabTitle}
+        </p>
+      </div>
 
       {/* Main Control */}
       <main className="space-y-8">
